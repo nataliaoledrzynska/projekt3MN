@@ -1,0 +1,131 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+def pochodna_gompertza(x):
+    return 0.4 * x * np.log(100000/x)
+
+def pochodna_verhulsta(x):
+    return 0.4 * x * (1 - x/100000)
+
+h = 0.01
+x = np.arange(75, 120, h)
+
+gom = np.zeros(len(x))
+ver = np.zeros(len(x))
+
+gom[0] = 10
+ver[0] = 10
+
+for i in range(1, len(x)):
+    gom[i] = gom[i-1] + h * pochodna_gompertza(gom[i-1])
+    ver[i] = ver[i-1] + h * pochodna_verhulsta(ver[i-1])
+
+plt.plot(x, gom, label='Gompertz eq.')
+plt.plot(x, ver, label='Verhulst eq.')
+plt.ylabel('population quantity')
+plt.xlabel('time')
+plt.title('Gompertz vs. Verhulst results')
+plt.legend()
+plt.show()  
+
+# Krzywa Gompertza pokazuje szybszy wzrost populacji niz krzywa Verhulsta.
+
+def pochodna_n1(n1, n2):
+    return (epsilon1 - gamma1 * (h1 * n1 + h2 * n2)) * n1
+
+def pochodna_n2(n1, n2):
+    return (epsilon2 - gamma2 * (h1 * n1 + h2 * n2)) * n2
+
+h = 0.001
+t = np.arange(0, 30, h)
+
+global epsilon1, gamma1, epsilon2, gamma2, h1, h2
+epsilon1, gamma1, h1 = 1.25, 0.5, 0.1
+epsilon2, gamma2, h2 = 0.5, 0.2, 0.2
+
+n1a = np.zeros(len(t))
+n2a = np.zeros(len(t))
+n1a[0], n2a[0] = 3, 4
+
+for i in range(len(t) - 1):
+    n1a[i + 1] = n1a[i] + h * pochodna_n1(n1a[i], n2a[i])
+    n2a[i + 1] = n2a[i] + h * pochodna_n2(n1a[i], n2a[i])
+
+plt.plot(t, n1a, label='N1')
+plt.plot(t, n2a, label='N2')
+plt.ylabel('Wielkość populacji')
+plt.xlabel('Czas')
+plt.legend()
+plt.show()  
+
+# Wielkość obydwu populacji początkowo rośnie. Następnie obydwie populacje osiągają stan równowagi.
+
+
+epsilon1, gamma1, h1 = 5, 4, 1
+epsilon2, gamma2, h2 = 5, 8, 4
+
+n1 = np.zeros(len(t))
+n2 = np.zeros(len(t))
+n1[0], n2[0] = 3, 4
+
+for i in range(len(t) - 1):
+    n1[i + 1] = n1[i] + h * pochodna_n1(n1[i], n2[i])
+    n2[i + 1] = n2[i] + h * pochodna_n2(n1[i], n2[i])
+
+plt.plot(t, n1, label='N1')
+plt.plot(t, n2, label='N2')
+plt.ylabel('Wielkość populacji')
+plt.xlabel('Czas')
+plt.legend()
+plt.show()  
+
+# Wielkość populacji początkowo maleje. Populacja N2 ginie po pewnym czasie.
+
+epsilon1, gamma1, h1 = 0.8, 1, 0.3
+epsilon2, gamma2, h2 = 0.4, 0.5, 0.4
+
+n1C = np.zeros(len(t))
+n2C = np.zeros(len(t))
+n1C[0], n2C[0] = 4,8
+
+for i in range(len(t) - 1):
+    n1C[i + 1] = n1C[i] + h * pochodna_n1(n1C[i], n2C[i])
+    n2C[i + 1] = n2C[i] + h * pochodna_n2(n1C[i], n2C[i])
+
+n1D = np.zeros(len(t))
+n2D = np.zeros(len(t))
+n1D[0], n2D[0] = 8,8
+
+for i in range(len(t) - 1):
+    n1D[i + 1] = n1D[i] + h * pochodna_n1(n1D[i], n2D[i])
+    n2D[i + 1] = n2D[i] + h * pochodna_n2(n1D[i], n2D[i])
+
+n1E = np.zeros(len(t))
+n2E = np.zeros(len(t))
+n1E[0], n2E[0] = 12,8
+
+for i in range(len(t) - 1):
+    n1E[i + 1] = n1E[i] + h * pochodna_n1(n1E[i], n2E[i])
+    n2E[i + 1] = n2E[i] + h * pochodna_n2(n1E[i], n2E[i])
+
+
+x = np.linspace(0, 12, 12)
+y = np.linspace(0, 12, 12)
+
+X, Y = np.meshgrid(x, y)
+dX = np.zeros(X.shape)
+dY = np.zeros(Y.shape)
+
+for i in range(X.shape[0]): 
+    for j in range(Y.shape[0]):
+        dX[i, j] = (epsilon1 - gamma1 * (h1 * X[i, j] + h2 * Y[i, j])) * X[i, j]
+        dY[i, j] = (epsilon2 - gamma2 * (h1 * X[i, j] + h2 * Y[i, j])) * Y[i, j]
+
+plt.quiver(X, Y, dX, dY)
+plt.plot(n1C, n2C, label='N1 = 4, N2 = 8')
+plt.plot(n1D, n2D, label='N1 = 8, N2 = 8')
+plt.plot(n1E, n2E, label='N1 = 12, N2 = 8')
+plt.legend()
+plt.xlabel('N1')
+plt.ylabel('N2')
+plt.show()
